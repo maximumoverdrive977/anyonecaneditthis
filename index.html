@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Editable Website</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 1em;
+        }
+        .editable-content {
+            margin: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px 0;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Simple Editable Website</h1>
+    </header>
+    
+    <div class="editable-content">
+        <h2 id="content-heading">This is the main heading</h2>
+        <p id="content-paragraph">Welcome to this simple editable website. You can edit the text below using the button.</p>
+        
+        <button onclick="editContent()">Edit Content</button>
+    </div>
+
+    <script>
+        function editContent() {
+            const heading = document.getElementById('content-heading');
+            const paragraph = document.getElementById('content-paragraph');
+            
+            // Allow the user to edit the heading and paragraph
+            const newHeading = prompt("Enter new heading text:", heading.innerText);
+            if (newHeading !== null) {
+                heading.innerText = newHeading;
+            }
+
+            const newParagraph = prompt("Enter new paragraph text:", paragraph.innerText);
+            if (newParagraph !== null) {
+                paragraph.innerText = newParagraph;
+            }
+        }
+    </script>
+</body>
+</html>
