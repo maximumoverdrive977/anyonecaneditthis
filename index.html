@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Editable Website</title>
+    <title>Fully Editable Website</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -23,6 +23,7 @@
             background-color: white;
             border-radius: 8px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
         button {
             padding: 10px 20px;
@@ -36,34 +37,65 @@
         button:hover {
             background-color: #45a049;
         }
+        .draggable {
+            cursor: move;
+        }
     </style>
 </head>
 <body>
     <header>
-        <h1>Simple Editable Website</h1>
+        <h1 contenteditable="true">Simple Editable Website</h1>
     </header>
     
-    <div class="editable-content">
-        <h2 id="content-heading">This is the main heading</h2>
-        <p id="content-paragraph">Welcome to this simple editable website. You can edit the text below using the button.</p>
-        
-        <button onclick="editContent()">Edit Content</button>
+    <div class="editable-content draggable" draggable="true">
+        <h2 contenteditable="true">This is the main heading</h2>
+        <p contenteditable="true">Welcome to this fully editable website. Click on any text to edit it directly. Drag elements to move them around.</p>
+        <button onclick="addImage()">Add Image</button>
     </div>
 
     <script>
-        function editContent() {
-            const heading = document.getElementById('content-heading');
-            const paragraph = document.getElementById('content-paragraph');
-            
-            // Allow the user to edit the heading and paragraph
-            const newHeading = prompt("Enter new heading text:", heading.innerText);
-            if (newHeading !== null) {
-                heading.innerText = newHeading;
-            }
+        // Make elements draggable
+        const draggables = document.querySelectorAll('.draggable');
+        draggables.forEach(item => {
+            item.addEventListener('dragstart', dragStart);
+            item.addEventListener('dragover', dragOver);
+            item.addEventListener('drop', drop);
+        });
 
-            const newParagraph = prompt("Enter new paragraph text:", paragraph.innerText);
-            if (newParagraph !== null) {
-                paragraph.innerText = newParagraph;
+        let draggedElement = null;
+
+        function dragStart(event) {
+            draggedElement = event.target;
+            event.dataTransfer.setData('text/plain', null);
+        }
+
+        function dragOver(event) {
+            event.preventDefault();
+        }
+
+        function drop(event) {
+            event.preventDefault();
+            if (event.target !== draggedElement) {
+                draggedElement.parentNode.insertBefore(draggedElement, event.target.nextSibling);
+            }
+        }
+
+        // Function to add an image
+        function addImage() {
+            const imageUrl = prompt("Enter the URL of the image:");
+            if (imageUrl) {
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.alt = "Editable Image";
+                img.style.maxWidth = "100%";
+                img.style.marginTop = "10px";
+                img.contentEditable = "true"; // Allow users to remove or edit
+                img.classList.add('draggable');
+                img.draggable = true;
+                document.body.appendChild(img);
+                img.addEventListener('dragstart', dragStart);
+                img.addEventListener('dragover', dragOver);
+                img.addEventListener('drop', drop);
             }
         }
     </script>
