@@ -21,13 +21,14 @@
             margin: 20px;
             padding: 20px;
             background-color: white;
+            border: 2px solid #ddd;
             border-radius: 8px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
             position: relative;
         }
         button {
             padding: 10px 20px;
-            margin: 10px 0;
+            margin: 10px 5px;
             background-color: #4CAF50;
             color: white;
             border: none;
@@ -41,9 +42,28 @@
             max-width: 100%;
             margin-top: 10px;
             display: block;
+            position: relative;
         }
         .draggable {
             cursor: move;
+        }
+        .delete-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 14px;
+            line-height: 20px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .delete-btn:hover {
+            background-color: darkred;
         }
     </style>
 </head>
@@ -57,6 +77,8 @@
         <p contenteditable="true">Welcome to this fully editable website. Click on any text to edit it directly. Drag elements to move them around.</p>
         <button onclick="document.getElementById('imageUpload').click()">Add Image</button>
         <input type="file" id="imageUpload" style="display: none;" accept="image/*" onchange="uploadImage(event)">
+        <button onclick="changeBackground()">Change Background Color</button>
+        <button onclick="changeBorders()">Change Border Color</button>
     </div>
 
     <script>
@@ -92,20 +114,50 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
+                    const imgContainer = document.createElement('div');
+                    imgContainer.style.position = "relative";
+                    imgContainer.classList.add('draggable');
+                    imgContainer.draggable = true;
+
                     const img = document.createElement('img');
                     img.src = e.target.result;
                     img.alt = "Uploaded Image";
                     img.contentEditable = "true"; // Allow users to remove or edit
-                    img.classList.add('draggable');
-                    img.draggable = true;
-                    document.body.appendChild(img);
+                    imgContainer.appendChild(img);
 
-                    // Make the new image draggable
-                    img.addEventListener('dragstart', dragStart);
-                    img.addEventListener('dragover', dragOver);
-                    img.addEventListener('drop', drop);
+                    const deleteButton = document.createElement('button');
+                    deleteButton.innerText = "×";
+                    deleteButton.classList.add('delete-btn');
+                    deleteButton.onclick = () => imgContainer.remove();
+                    imgContainer.appendChild(deleteButton);
+
+                    document.body.appendChild(imgContainer);
+
+                    // Make the new image container draggable
+                    imgContainer.addEventListener('dragstart', dragStart);
+                    imgContainer.addEventListener('dragover', dragOver);
+                    imgContainer.addEventListener('drop', drop);
                 };
                 reader.readAsDataURL(file);
+            }
+        }
+
+        // Function to change background color
+        function changeBackground() {
+            const color = prompt("Enter a background color (e.g., 'lightblue', '#ffcc00'):");
+            if (color) {
+                document.body.style.backgroundColor = color;
+            }
+        }
+
+        // Function to change border color
+        function changeBorders() {
+            const color = prompt("Enter a border color (e.g., 'red', '#333'):");
+            if (color) {
+                const elements = document.querySelectorAll('.editable-content');
+                elements.forEach(element => {
+                    element.style.borderColor = color;
+                });
             }
         }
     </script>
