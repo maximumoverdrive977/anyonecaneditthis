@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fully Editable Website</title>
+    <title>Real-Time Editable Site</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -21,14 +21,23 @@
             margin: 20px;
             padding: 20px;
             background-color: white;
-            border: 2px solid #ddd;
             border-radius: 8px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            position: relative;
+        }
+        [contenteditable] {
+            border: 1px dashed #ddd;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            background-color: #fafafa;
+        }
+        [contenteditable]:focus {
+            outline: none;
+            border-color: #4CAF50;
         }
         button {
             padding: 10px 20px;
-            margin: 10px 5px;
+            margin: 10px 0;
             background-color: #4CAF50;
             color: white;
             border: none;
@@ -38,155 +47,66 @@
         button:hover {
             background-color: #45a049;
         }
-        .draggable {
-            cursor: move;
-        }
-        .text-box {
-            margin: 10px 0;
-            padding: 10px;
-            background-color: white;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            display: inline-block;
-            cursor: move;
-            min-width: 100px;
-        }
-        .delete-btn {
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            background-color: red;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            font-size: 14px;
-            line-height: 20px;
-            text-align: center;
-            cursor: pointer;
-        }
-        .delete-btn:hover {
-            background-color: darkred;
-        }
     </style>
+    <!-- Firebase scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-analytics.js"></script>
 </head>
 <body>
     <header>
-        <h1 contenteditable="true">Simple Editable Website</h1>
+        <h1>Real-Time Editable Site</h1>
     </header>
     
-    <div class="editable-content draggable" draggable="true">
-        <h2 contenteditable="true">This is the main heading</h2>
-        <p contenteditable="true">Welcome to this fully editable website. Click on any text to edit it directly. Drag elements to move them around.</p>
-        <button onclick="document.getElementById('imageUpload').click()">Add Image</button>
-        <input type="file" id="imageUpload" style="display: none;" accept="image/*" onchange="uploadImage(event)">
-        <button onclick="addTextBox()">Add Text Box</button>
-        <button onclick="changeBackground()">Change Background Color</button>
-        <button onclick="changeBorders()">Change Border Color</button>
+    <div class="editable-content">
+        <h2 id="content-heading" contenteditable="true">This is the main heading</h2>
+        <p id="content-paragraph" contenteditable="true">Welcome to this real-time editable website. Make changes and see them sync instantly!</p>
     </div>
 
     <script>
-        // Make elements draggable
-        const draggables = document.querySelectorAll('.draggable');
-        draggables.forEach(item => {
-            item.addEventListener('dragstart', dragStart);
-            item.addEventListener('dragover', dragOver);
-            item.addEventListener('drop', drop);
-        });
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBgXMrTd4bzuMBz53pUrfkMmunKaE_dtmI",
+            authDomain: "editable-site-f9bbb.firebaseapp.com",
+            databaseURL: "https://editable-site-f9bbb-default-rtdb.firebaseio.com",
+            projectId: "editable-site-f9bbb",
+            storageBucket: "editable-site-f9bbb.appspot.com",
+            messagingSenderId: "719114073981",
+            appId: "1:719114073981:web:b9109b08d24670260efe14",
+            measurementId: "G-21SNT6VK1G"
+        };
 
-        let draggedElement = null;
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-        function dragStart(event) {
-            draggedElement = event.target;
-            event.dataTransfer.setData('text/plain', null);
+        // Save content to Firebase
+        function updateContent(id, value) {
+            firebase.database().ref(`content/${id}`).set({
+                id: id,
+                value: value
+            });
         }
 
-        function dragOver(event) {
-            event.preventDefault();
-        }
-
-        function drop(event) {
-            event.preventDefault();
-            if (event.target !== draggedElement) {
-                draggedElement.parentNode.insertBefore(draggedElement, event.target.nextSibling);
-            }
-        }
-
-        // Function to handle image upload
-        function uploadImage(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const imgContainer = document.createElement('div');
-                    imgContainer.style.position = "relative";
-                    imgContainer.classList.add('draggable');
-                    imgContainer.draggable = true;
-
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.alt = "Uploaded Image";
-                    img.style.maxWidth = "100%";
-                    imgContainer.appendChild(img);
-
-                    const deleteButton = document.createElement('button');
-                    deleteButton.innerText = "×";
-                    deleteButton.classList.add('delete-btn');
-                    deleteButton.onclick = () => imgContainer.remove();
-                    imgContainer.appendChild(deleteButton);
-
-                    document.body.appendChild(imgContainer);
-
-                    // Make the new image container draggable
-                    imgContainer.addEventListener('dragstart', dragStart);
-                    imgContainer.addEventListener('dragover', dragOver);
-                    imgContainer.addEventListener('drop', drop);
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        // Function to add a text box
-        function addTextBox() {
-            const textBoxContainer = document.createElement('div');
-            textBoxContainer.classList.add('text-box', 'draggable');
-            textBoxContainer.contentEditable = "true";
-            textBoxContainer.draggable = true;
-            textBoxContainer.innerText = "New Text Box";
-            
-            const deleteButton = document.createElement('button');
-            deleteButton.innerText = "×";
-            deleteButton.classList.add('delete-btn');
-            deleteButton.onclick = () => textBoxContainer.remove();
-            textBoxContainer.appendChild(deleteButton);
-
-            document.body.appendChild(textBoxContainer);
-
-            // Make the new text box draggable
-            textBoxContainer.addEventListener('dragstart', dragStart);
-            textBoxContainer.addEventListener('dragover', dragOver);
-            textBoxContainer.addEventListener('drop', drop);
-        }
-
-        // Function to change background color
-        function changeBackground() {
-            const color = prompt("Enter a background color (e.g., 'lightblue', '#ffcc00'):");
-            if (color) {
-                document.body.style.backgroundColor = color;
-            }
-        }
-
-        // Function to change border color
-        function changeBorders() {
-            const color = prompt("Enter a border color (e.g., 'red', '#333'):");
-            if (color) {
-                const elements = document.querySelectorAll('.editable-content');
-                elements.forEach(element => {
-                    element.style.borderColor = color;
+        // Listen for real-time changes from Firebase
+        firebase.database().ref("content").on("value", (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                Object.keys(data).forEach((key) => {
+                    const element = document.getElementById(data[key].id);
+                    if (element) {
+                        element.innerHTML = data[key].value;
+                    }
                 });
             }
-        }
+        });
+
+        // Detect changes in contenteditable elements and update Firebase
+        document.querySelectorAll("[contenteditable=true]").forEach((element) => {
+            element.addEventListener("input", () => {
+                updateContent(element.id, element.innerHTML);
+            });
+        });
     </script>
 </body>
 </html>
