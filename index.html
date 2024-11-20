@@ -37,6 +37,11 @@
         button:hover {
             background-color: #45a049;
         }
+        img {
+            max-width: 100%;
+            margin-top: 10px;
+            display: block;
+        }
         .draggable {
             cursor: move;
         }
@@ -50,7 +55,8 @@
     <div class="editable-content draggable" draggable="true">
         <h2 contenteditable="true">This is the main heading</h2>
         <p contenteditable="true">Welcome to this fully editable website. Click on any text to edit it directly. Drag elements to move them around.</p>
-        <button onclick="addImage()">Add Image</button>
+        <button onclick="document.getElementById('imageUpload').click()">Add Image</button>
+        <input type="file" id="imageUpload" style="display: none;" accept="image/*" onchange="uploadImage(event)">
     </div>
 
     <script>
@@ -80,22 +86,26 @@
             }
         }
 
-        // Function to add an image
-        function addImage() {
-            const imageUrl = prompt("Enter the URL of the image:");
-            if (imageUrl) {
-                const img = document.createElement('img');
-                img.src = imageUrl;
-                img.alt = "Editable Image";
-                img.style.maxWidth = "100%";
-                img.style.marginTop = "10px";
-                img.contentEditable = "true"; // Allow users to remove or edit
-                img.classList.add('draggable');
-                img.draggable = true;
-                document.body.appendChild(img);
-                img.addEventListener('dragstart', dragStart);
-                img.addEventListener('dragover', dragOver);
-                img.addEventListener('drop', drop);
+        // Function to handle image upload
+        function uploadImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.alt = "Uploaded Image";
+                    img.contentEditable = "true"; // Allow users to remove or edit
+                    img.classList.add('draggable');
+                    img.draggable = true;
+                    document.body.appendChild(img);
+
+                    // Make the new image draggable
+                    img.addEventListener('dragstart', dragStart);
+                    img.addEventListener('dragover', dragOver);
+                    img.addEventListener('drop', drop);
+                };
+                reader.readAsDataURL(file);
             }
         }
     </script>
