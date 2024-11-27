@@ -64,32 +64,33 @@
     </div>
 
     <script>
-        // Your Firebase configuration
+        // Firebase configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyBgXMrTd4bzuMBz53pUrfkMmunKaE_dtmI",
-            authDomain: "editable-site-f9bbb.firebaseapp.com",
-            databaseURL: "https://editable-site-f9bbb-default-rtdb.firebaseio.com",
-            projectId: "editable-site-f9bbb",
-            storageBucket: "editable-site-f9bbb.appspot.com",
-            messagingSenderId: "719114073981",
-            appId: "1:719114073981:web:b9109b08d24670260efe14",
-            measurementId: "G-21SNT6VK1G"
+            apiKey: "AIzaSyDhSHVbx-a3u5vCaKXB8O2mX5-RRDy64mw",
+            authDomain: "real-time-editable-website.firebaseapp.com",
+            databaseURL: "https://real-time-editable-website-default-rtdb.firebaseio.com",
+            projectId: "real-time-editable-website",
+            storageBucket: "real-time-editable-website.appspot.com",
+            messagingSenderId: "865933430643",
+            appId: "1:865933430643:web:02f5ff2ba9873734b77f06",
+            measurementId: "G-KP9RX7DQQJ"
         };
 
         // Initialize Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        const analytics = firebase.analytics();
 
         // Save content to Firebase
         function updateContent(id, value) {
-            firebase.database().ref(`content/${id}`).set({
+            db.ref(`content/${id}`).set({
                 id: id,
                 value: value
             });
         }
 
-        // Listen for real-time changes from Firebase
-        firebase.database().ref("content").on("value", (snapshot) => {
+        // Listen for real-time updates from Firebase
+        db.ref("content").on("value", (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 Object.keys(data).forEach((key) => {
